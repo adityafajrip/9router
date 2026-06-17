@@ -62,7 +62,6 @@ PUBLIC.en.md
 PR/*
 package-lock.json
 
-
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 README1.md
@@ -73,7 +72,10 @@ scripts/agSniffer/*
 gitbooks/*
 gitbook/README.md
 
-
+# Build artifacts
 *.tar
 *.tar.gz
 *.log
+
+# Refactor backup reference (do not bundle/lint)
+open-sse.old/
