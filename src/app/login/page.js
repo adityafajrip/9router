@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [oidcLoginLabel, setOidcLoginLabel] = useState("Sign in with OIDC");
   const [mustChange, setMustChange] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+  const [emailNotWhitelisted, setEmailNotWhitelisted] = useState(false);
   const router = useRouter();
 
   // Countdown for rate-limit
@@ -24,6 +25,13 @@ export default function LoginPage() {
     const id = setInterval(() => setRetryAfter((s) => (s > 0 ? s - 1 : 0)), 1000);
     return () => clearInterval(id);
   }, [retryAfter]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("error") === "email_not_whitelisted") {
+      setEmailNotWhitelisted(true);
+    }
+  }, []);
 
   useEffect(() => {
     async function checkAuth() {
@@ -152,6 +160,33 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {emailNotWhitelisted && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-bg border border-border rounded-2xl shadow-2xl max-w-md w-full p-8 animate-in zoom-in-95 duration-300">
+              <div className="flex flex-col items-center gap-4 text-center">
+                <div className="text-7xl animate-bounce">🫵😂</div>
+                <h2 className="text-2xl font-bold text-red-500 dark:text-red-400">
+                  Who is this?
+                </h2>
+                <p className="text-text-muted">
+                  Your email is not on the access list. Contact the admin to get access to this dashboard.
+                </p>
+                <Button
+                  type="button"
+                  variant="primary"
+                  className="w-full mt-2"
+                  onClick={() => {
+                    setEmailNotWhitelisted(false);
+                    router.push("/login");
+                  }}
+                >
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <Card>
           {mustChange ? (
             <form onSubmit={handleSetNewPassword} className="flex flex-col gap-4">
@@ -230,15 +265,6 @@ export default function LoginPage() {
                 >
                   {retryAfter > 0 ? `Wait ${retryAfter}s` : "Login"}
                 </Button>
-
-                <p className="text-xs text-center text-text-muted mt-2">
-                  Default password is <code className="bg-sidebar px-1 rounded">123456</code>
-                </p>
-                {hasPassword === false && (
-                  <p className="text-xs text-center text-amber-600 dark:text-amber-400">
-                    Security risk: no password set. You will be asked to set one when logging in remotely.
-                  </p>
-                )}
               </form>
             ) : (
               error && <p className="text-xs text-red-500">{error}</p>

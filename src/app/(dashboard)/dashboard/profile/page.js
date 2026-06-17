@@ -42,6 +42,7 @@ export default function ProfilePage() {
     oidcClientId: "",
     oidcScopes: "openid profile email",
     oidcLoginLabel: "Sign in with OIDC",
+    oidcEmailWhitelist: "",
   });
   const [oidcClientSecret, setOidcClientSecret] = useState("");
   const [oidcStatus, setOidcStatus] = useState({ type: "", message: "" });
@@ -75,6 +76,7 @@ export default function ProfilePage() {
           oidcClientId: data?.oidcClientId || "",
           oidcScopes: data?.oidcScopes || "openid profile email",
           oidcLoginLabel: data?.oidcLoginLabel || "Sign in with OIDC",
+          oidcEmailWhitelist: data?.oidcEmailWhitelist || "",
         });
         setOidcClientSecret("");
         if (data?.authMode === "oidc" || data?.authMode === "both") setOidcExpanded(true);
@@ -337,6 +339,7 @@ export default function ProfilePage() {
         oidcClientId: clientId,
         oidcScopes: scopes || "openid profile email",
         oidcLoginLabel: loginLabel || "Sign in with OIDC",
+        oidcEmailWhitelist: oidcForm.oidcEmailWhitelist.trim(),
       };
       if (secret) {
         payload.oidcClientSecret = secret;
@@ -357,6 +360,7 @@ export default function ProfilePage() {
           oidcClientId: data?.oidcClientId || clientId,
           oidcScopes: data?.oidcScopes || scopes || "openid profile email",
           oidcLoginLabel: data?.oidcLoginLabel || loginLabel || "Sign in with OIDC",
+          oidcEmailWhitelist: data?.oidcEmailWhitelist || "",
         });
         setOidcClientSecret("");
         setOidcStatus({
@@ -403,6 +407,7 @@ export default function ProfilePage() {
           oidcClientId: clientId,
           oidcScopes: scopes || "openid profile email",
           oidcLoginLabel: oidcForm.oidcLoginLabel.trim() || "Sign in with OIDC",
+          oidcEmailWhitelist: oidcForm.oidcEmailWhitelist.trim(),
           ...(secret ? { oidcClientSecret: secret } : {}),
         }),
       });
@@ -875,6 +880,20 @@ export default function ProfilePage() {
                   disabled={loading || oidcLoading}
                 />
               </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="font-medium text-sm sm:text-base">Email Whitelist</label>
+                <Input
+                  placeholder="user1@example.com, user2@example.com"
+                  value={oidcForm.oidcEmailWhitelist}
+                  onChange={(e) => updateOidcForm("oidcEmailWhitelist", e.target.value)}
+                  disabled={loading || oidcLoading}
+                />
+                <p className="text-xs sm:text-sm text-text-muted">
+                  Comma-separated list of allowed emails. Leave empty to allow all authenticated OIDC users.
+                </p>
+              </div>
+
             </div>
 
             <div className="rounded-lg border border-border bg-bg p-3 text-xs sm:text-sm text-text-muted">
