@@ -232,3 +232,19 @@ export function pickOidcDisplayName(payload = {}) {
 export function pickOidcEmail(payload = {}) {
   return payload.email || "";
 }
+
+export function parseEmailWhitelist(whitelistStr) {
+  if (!whitelistStr || typeof whitelistStr !== "string") return new Set();
+  return new Set(
+    whitelistStr
+      .split(",")
+      .map((email) => email.trim().toLowerCase())
+      .filter((email) => email.length > 0)
+  );
+}
+
+export function isEmailWhitelisted(email, whitelist) {
+  if (!email || typeof email !== "string") return false;
+  if (whitelist.size === 0) return true;
+  return whitelist.has(email.trim().toLowerCase());
+}

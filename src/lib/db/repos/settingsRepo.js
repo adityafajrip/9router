@@ -24,6 +24,7 @@ const DEFAULT_SETTINGS = {
   oidcClientSecret: "",
   oidcScopes: "openid profile email",
   oidcLoginLabel: "Sign in with OIDC",
+  oidcEmailWhitelist: "",
   enableObservability: true,
   observabilityMaxRecords: 1000,
   observabilityBatchSize: 20,

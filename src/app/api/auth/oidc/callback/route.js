@@ -8,8 +8,11 @@ import {
   pickOidcDisplayName,
   pickOidcEmail,
   verifyOidcIdToken,
+  parseEmailWhitelist,
+  isEmailWhitelisted,
 } from "@/lib/auth/oidc";
 import { setDashboardAuthCookie } from "@/lib/auth/dashboardSession";
+import { getSettings } from "@/lib/localDb";
 
 function clearOidcCookies(cookieStore) {
   cookieStore.delete("oidc_state");
@@ -71,11 +74,23 @@ export async function GET(request) {
       nonce: storedNonce,
     });
 
+    const email = pickOidcEmail(payload);
+
+    const settings = await getSettings();
+    const whitelist = parseEmailWhitelist(settings.oidcEmailWhitelist);
+
+    if (!isEmailWhitelisted(email, whitelist)) {
+      clearOidcCookies(cookieStore);
+      return NextResponse.redirect(
+        new URL("/login?error=email_not_whitelisted", getPublicOrigin(request))
+      );
+    }
+
     clearOidcCookies(cookieStore);
     await setDashboardAuthCookie(cookieStore, request, {
       oidc: true,
       oidcSub: payload.sub || null,
-      oidcEmail: pickOidcEmail(payload) || null,
+      oidcEmail: email || null,
       oidcName: pickOidcDisplayName(payload),
     });
 
